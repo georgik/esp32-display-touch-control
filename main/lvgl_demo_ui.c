@@ -35,6 +35,17 @@ static void slider_event_handler(lv_event_t *e) {
     lv_obj_align(label_value, LV_ALIGN_TOP_LEFT, 0, 0);
 }
 
+// Slider for screen brightness adjustment
+static void brightness_slider_event_handler(lv_event_t *e) {
+    lv_obj_t *slider = lv_event_get_target(e);
+    int value = lv_slider_get_value(slider);
+    // LVGL set brignthess for LCD backlight on M5Stack CoreS3, use LCD_BL from bsp
+
+
+
+    lv_led_set_brightness(NULL, value);
+}
+
 static void anim_timer_cb(lv_timer_t *timer) {
     my_timer_context_t *timer_ctx = (my_timer_context_t *) timer->user_data;
     int count = timer_ctx->count_val;
@@ -63,30 +74,35 @@ static void anim_timer_cb(lv_timer_t *timer) {
         lv_obj_set_style_img_opa(img_text, 0, 0);
 
 
- // Create label for displaying the slider value
-    label_value = lv_label_create(scr);
-    lv_label_set_text(label_value, "Teplota: 0");
-    
-    lv_obj_align(label_value, LV_ALIGN_TOP_LEFT, 0, 0);
+        // Create label for displaying the slider value
+        label_value = lv_label_create(scr);
+        lv_label_set_text(label_value, "Teplota: 0");
 
-    // Create a slider
-    slider = lv_slider_create(scr);
-    lv_obj_set_width(slider, 200); // Set the slider's width
-    lv_obj_align(slider, LV_ALIGN_CENTER, 0, 50); // Position the slider
-    lv_slider_set_range(slider, -20, 40); // Set the slider's range
+        lv_obj_align(label_value, LV_ALIGN_TOP_LEFT, 0, 0);
 
-    // Add event callback to the slider
-    lv_obj_add_event_cb(slider, slider_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+        // Create a slider
+        slider = lv_slider_create(scr);
+        lv_obj_set_width(slider, 200); // Set the slider's width
+        lv_obj_align(slider, LV_ALIGN_CENTER, 0, 50); // Position the slider
+        lv_slider_set_range(slider, -20, 40); // Set the slider's range
+
+        // Add event callback to the slider
+        lv_obj_add_event_cb(slider, slider_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+
+        // Vertical slider for screen brightness adjustment
+        // lv_obj_t *slider2 = lv_slider_create(scr);
+        // lv_obj_set_width(slider2, 20); // Set the slider's width
+        // lv_obj_set_height(slider2, 200); // Set the slider's height
+        // lv_obj_align(slider2, LV_ALIGN_RIGHT_MID, 0, 100); // Position the slider
+        // lv_slider_set_range(slider2, 0, 255); // Set the slider's range
+        // lv_slider_set_value(slider2, 50, LV_ANIM_OFF); // Set the slider's value
+
+        // // Callback for the vertical slider to adjust the screen brightness
+        // lv_obj_add_event_cb(slider2, brightness_slider_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
 
     }
 
-    // Move images when arc animation finished
-    // if ((count >= 100) && (count <= 180)) {
-    //     lv_coord_t offset = (sinf((count - 140) * 2.25f / 90.0f) + 1) * 20.0f;
-    //     lv_obj_align(img_logo, LV_ALIGN_CENTER, 0, -offset);
-    //     lv_obj_align(img_text, LV_ALIGN_CENTER, 0, 2 * offset);
-    //     lv_obj_set_style_img_opa(img_text, offset / 40.0f * 255, 0);
-    // }
+
 
     // Delete timer when all animation finished
     if ((count += 5) == 220) {
