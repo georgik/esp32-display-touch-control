@@ -1,5 +1,8 @@
 #include <math.h>
 #include "lvgl.h"
+#include "esp_err.h"
+
+#include "bsp/display.h"
 
 #ifndef PI
 #define PI  (3.14159f)
@@ -39,11 +42,8 @@ static void slider_event_handler(lv_event_t *e) {
 static void brightness_slider_event_handler(lv_event_t *e) {
     lv_obj_t *slider = lv_event_get_target(e);
     int value = lv_slider_get_value(slider);
-    // LVGL set brignthess for LCD backlight on M5Stack CoreS3, use LCD_BL from bsp
+    bsp_display_brightness_set(value);
 
-
-
-    lv_led_set_brightness(NULL, value);
 }
 
 static void anim_timer_cb(lv_timer_t *timer) {
@@ -90,15 +90,15 @@ static void anim_timer_cb(lv_timer_t *timer) {
         lv_obj_add_event_cb(slider, slider_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
 
         // Vertical slider for screen brightness adjustment
-        // lv_obj_t *slider2 = lv_slider_create(scr);
-        // lv_obj_set_width(slider2, 20); // Set the slider's width
-        // lv_obj_set_height(slider2, 200); // Set the slider's height
-        // lv_obj_align(slider2, LV_ALIGN_RIGHT_MID, 0, 100); // Position the slider
-        // lv_slider_set_range(slider2, 0, 255); // Set the slider's range
-        // lv_slider_set_value(slider2, 50, LV_ANIM_OFF); // Set the slider's value
+        lv_obj_t *slider2 = lv_slider_create(scr);
+        lv_obj_set_width(slider2, 20); // Set the slider's width
+        lv_obj_set_height(slider2, 200); // Set the slider's height
+        lv_obj_align(slider2, LV_ALIGN_RIGHT_MID, 0, 0); // Position the slider
+        lv_slider_set_range(slider2, 0, 100); // Set the slider's range
+        lv_slider_set_value(slider2, 50, LV_ANIM_OFF); // Set the slider's value
 
-        // // Callback for the vertical slider to adjust the screen brightness
-        // lv_obj_add_event_cb(slider2, brightness_slider_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+        // Callback for the vertical slider to adjust the screen brightness
+        lv_obj_add_event_cb(slider2, brightness_slider_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
 
     }
 
