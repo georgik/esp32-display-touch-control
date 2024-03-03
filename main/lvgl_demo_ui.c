@@ -100,6 +100,11 @@ static void anim_timer_cb(lv_timer_t *timer) {
         // Callback for the vertical slider to adjust the screen brightness
         lv_obj_add_event_cb(slider2, brightness_slider_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
 
+      // Create a label for the battery status
+        lv_obj_t *battery_label = lv_label_create(scr);
+        // Combine a battery symbol with the text
+        lv_label_set_text(battery_label, LV_SYMBOL_BATTERY_FULL " Battery: 72%");
+        lv_obj_align(battery_label, LV_ALIGN_BOTTOM_RIGHT, -10, 0);
     }
 
 
