@@ -46,6 +46,8 @@ static void brightness_slider_event_handler(lv_event_t *e) {
 
 }
 
+int8_t bsp_get_battery_level(void);
+
 static void anim_timer_cb(lv_timer_t *timer) {
     my_timer_context_t *timer_ctx = (my_timer_context_t *) timer->user_data;
     int count = timer_ctx->count_val;
@@ -102,9 +104,56 @@ static void anim_timer_cb(lv_timer_t *timer) {
 
       // Create a label for the battery status
         lv_obj_t *battery_label = lv_label_create(scr);
-        // Combine a battery symbol with the text
-        lv_label_set_text(battery_label, LV_SYMBOL_BATTERY_FULL " Battery: 72%");
+
+        // Define styles for different battery levels
+        static lv_style_t style_green, style_yellow, style_red;
+        lv_style_init(&style_green);
+        lv_style_set_text_color(&style_green, lv_color_hex(0x00FF00)); // Green
+        lv_style_init(&style_yellow);
+        lv_style_set_text_color(&style_yellow, lv_color_hex(0xFFFF00)); // Yellow
+        lv_style_init(&style_red);
+        lv_style_set_text_color(&style_red, lv_color_hex(0xFF0000)); // Red
+
+        // Get the current battery level
+        int8_t battery_level = bsp_get_battery_level();
+
+        // Determine the appropriate symbol and style based on the battery level
+        const char *battery_symbol = LV_SYMBOL_BATTERY_FULL;  // Default to full battery symbol
+        lv_style_t *battery_style = &style_green; // Default to green color
+        if (battery_level < 0) {
+            battery_symbol = LV_SYMBOL_BATTERY_EMPTY;  // Error or unknown battery status
+            battery_style = &style_red; // Use red color for error/unknown status
+        } else if (battery_level <= 20) {
+            battery_symbol = LV_SYMBOL_BATTERY_1;
+            battery_style = &style_red;
+        } else if (battery_level <= 40) {
+            battery_symbol = LV_SYMBOL_BATTERY_2;
+            battery_style = &style_yellow;
+        } else if (battery_level <= 60) {
+            battery_symbol = LV_SYMBOL_BATTERY_3;
+            battery_style = &style_yellow;
+        } else if (battery_level <= 80) {
+            battery_symbol = LV_SYMBOL_BATTERY_FULL;
+            battery_style = &style_yellow;
+        } // Above 80% remains green
+
+        // Create a buffer to store the full label text including the battery level
+        char battery_label_text[64];
+        snprintf(battery_label_text, sizeof(battery_label_text), "%s Battery: %d%%", battery_symbol, battery_level);
+
+        // Update the label with the battery symbol, level, and apply the color style
+        lv_label_set_text(battery_label, battery_label_text);
+        lv_obj_add_style(battery_label, battery_style, 0); // Apply the style
         lv_obj_align(battery_label, LV_ALIGN_BOTTOM_RIGHT, -10, 0);
+
+
+
+
+
+        // int8_t battery_level = bsp_get_battery_level();
+        // // Combine a battery symbol with the text
+        // lv_label_set_text(battery_label, LV_SYMBOL_BATTERY_FULL " Battery: 72%");
+        // lv_obj_align(battery_label, LV_ALIGN_BOTTOM_RIGHT, -10, 0);
     }
 
 

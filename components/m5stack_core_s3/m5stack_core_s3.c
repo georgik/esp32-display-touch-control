@@ -32,6 +32,8 @@ static const char *TAG = "M5Stack";
 #define BSP_AXP2101_ADDR    0x34
 #define BSP_AW9523_ADDR     0x58
 
+#define AXP2101_BATT_LEVEL_REG 0xA4
+
 /* Features */
 typedef enum {
     BSP_FEATURE_LCD,
@@ -517,5 +519,34 @@ bool bsp_display_lock(uint32_t timeout_ms)
 void bsp_display_unlock(void)
 {
     lvgl_port_unlock();
+}
+
+
+
+/**
+ * @brief Read an 8-bit register from the AXP2101.
+ *
+ * @param reg_addr Address of the register to read.
+ * @return The value of the register, or -1 in case of an error.
+ */
+static int8_t bsp_axp2101_read_register(uint8_t reg_addr) {
+    uint8_t data;
+    esp_err_t ret = i2c_master_write_read_device(BSP_I2C_NUM, BSP_AXP2101_ADDR, &reg_addr, 1, &data, 1, 1000 / portTICK_PERIOD_MS);
+    if (ret == ESP_OK) {
+        return data;
+    } else {
+        ESP_LOGE(TAG, "Failed to read register: 0x%02X, I2C error: 0x%02X", reg_addr, ret);
+        return -1;  // Use an error code that makes sense in your context
+    }
+}
+
+/**
+ * @brief Get the battery level from AXP2101.
+ *
+ * @return Battery level as a percentage, or -1 in case of an error.
+ */
+int8_t bsp_get_battery_level(void) {
+    int8_t res = bsp_axp2101_read_register(AXP2101_BATT_LEVEL_REG);
+    return res;
 }
 #endif // (BSP_CONFIG_NO_GRAPHIC_LIB == 0)

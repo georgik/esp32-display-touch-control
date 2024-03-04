@@ -419,6 +419,10 @@ void bsp_display_unlock(void);
  * @param[in] rotation Angle of the display rotation
  */
 void bsp_display_rotate(lv_disp_t *disp, lv_disp_rot_t rotation);
+
+
+int8_t bsp_get_battery_level(void);
+
 #endif // BSP_CONFIG_NO_GRAPHIC_LIB == 0
 
 #ifdef __cplusplus
