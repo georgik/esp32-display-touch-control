@@ -57,36 +57,47 @@ static void update_battery_status(lv_timer_t *timer) {
     }
 
 
-        // Define styles for different battery levels
-        static lv_style_t style_green, style_yellow, style_red;
-        lv_style_init(&style_green);
-        lv_style_set_text_color(&style_green, lv_color_hex(0x00FF00)); // Green
-        lv_style_init(&style_yellow);
-        lv_style_set_text_color(&style_yellow, lv_color_hex(0xFFFF00)); // Yellow
-        lv_style_init(&style_red);
-        lv_style_set_text_color(&style_red, lv_color_hex(0xFF0000)); // Red
+    // Define and initialize styles for different battery levels
+    static lv_style_t style_green, style_dark_yellow, style_red, style_light_green, style_orange;
+
+    lv_style_init(&style_green);
+    lv_style_set_text_color(&style_green, lv_color_hex(0x00FF00)); // Green
+
+    lv_style_init(&style_dark_yellow);
+    lv_style_set_text_color(&style_dark_yellow, lv_color_hex(0xFFD700)); // Darker Yellow
+
+    lv_style_init(&style_red);
+    lv_style_set_text_color(&style_red, lv_color_hex(0xFF0000)); // Red
+
+    lv_style_init(&style_light_green);
+    lv_style_set_text_color(&style_light_green, lv_color_hex(0x90EE90)); // Light Green
+
+    lv_style_init(&style_orange);
+    lv_style_set_text_color(&style_orange, lv_color_hex(0xFFA500)); // Orange
+
     // Read battery level
     int8_t battery_level = bsp_get_battery_level();
 
     // Choose symbol and style based on battery level
     const char *battery_symbol = LV_SYMBOL_BATTERY_FULL;
-    lv_style_t *battery_style = &style_green; // Assume styles are already initialized
+    lv_style_t *battery_style = &style_green; // Default to green for high levels
     if (battery_level < 0) {
         battery_symbol = LV_SYMBOL_BATTERY_EMPTY;
-        battery_style = &style_red;
+        battery_style = &style_red; // Error or unknown battery status
     } else if (battery_level <= 20) {
         battery_symbol = LV_SYMBOL_BATTERY_1;
-        battery_style = &style_red;
+        battery_style = &style_orange; // Orange for very low battery
     } else if (battery_level <= 40) {
         battery_symbol = LV_SYMBOL_BATTERY_2;
-        battery_style = &style_yellow;
+        battery_style = &style_dark_yellow; // Darker yellow for better visibility
     } else if (battery_level <= 60) {
         battery_symbol = LV_SYMBOL_BATTERY_3;
-        battery_style = &style_yellow;
+        battery_style = &style_light_green; // Light green for medium-low battery
     } else if (battery_level <= 80) {
         battery_symbol = LV_SYMBOL_BATTERY_FULL;
-        battery_style = &style_yellow;
+        battery_style = &style_green; // Green for medium-high battery
     }
+
 
     // Update label
     char label_text[64];
